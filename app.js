@@ -3,7 +3,7 @@ const http = require("http");
 const mongo = require("mongoose");
 const bodyParser = require("body-parser");
 const mongoconnection = require("./config/mongoconnection.json");
-const { add } = require("./controller/chatController");
+const employee=require("./modele/Employe")
 var path = require("path");
 mongo
   .connect(mongoconnection.url, {
@@ -23,24 +23,24 @@ app.set("view engine", "twig");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const UserRouter = require("./routes/user");
-app.use("/user", UserRouter);
+const EmpRouter = require("./routes/Employe");
+app.use("/employee", EmpRouter);
 
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 io.on("connection", (socket) => {
-  console.log("User connected");
-  socket.emit("msg", "A new user is connected");
+  console.log("employess loaded");
+  socket.emit("msg", "A new employess is connected");
   socket.on("typing", (data) => {
     socket.broadcast.emit("typing", data);
   });
   socket.on("msg", (data) => {
     console.log("d1" + data);
-    add(data);
+   
     io.emit("msg", data);
   });
   socket.on("disconnect", () => {
-    io.emit("msg", "An user is diconnected");
+    io.emit("msg", "An employess is diconnected");
   });
 });
 server.listen(3000, () => console.log("server is run"));
