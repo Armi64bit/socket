@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <label for="ch">Username:</label>
+    <input id="usernameInput" type="text">
+    <button onclick="searchByUsername()">Search</button>
+
+    <div id="userList"></div>
+
+    <script>
+        const socket = io.connect();
+
+        socket.on('connect', () => {
+            fetchUsers();
+			fetchUsers2();
+			
+        });
+
+ function fetchUsers2() {
+            fetch('http://localhost:3000/user/getall')
+                .then(response => response.json())
+                .then(users => {
+                    users.forEach(user => {
+                        if (user.cin === 1) {
+                            alert(`CIN is equal to 1 for user: ${user.name}`);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching users:', error));
+        }
+
+        function fetchUsers() {
+            fetch('http://localhost:3000/user/getall')
+                .then(response => response.json())
+                .then(users => {
+                    displayUsers(users);
+                })
+                .catch(error => console.error('Error fetching users:', error));
+        }
+
+        function displayUsers(users) {
+            const userListDiv = document.getElementById('userList');
+            userListDiv.innerHTML = ''; // Clear previous content
+
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.textContent = `Name: ${user.name}, Email: ${user.email}, CIN: ${user.cin}`;
+                userListDiv.appendChild(userDiv);
+            });
+        }
+
+        function searchByUsername() {
+            const username = prompt('Enter username to search:');
+            if (username) {
+                fetch(`http://localhost:3000/user/getbyusername?username=${username}`)
+                    .then(response => response.json())
+                    .then(users => {
+                        if (users.length === 0) {
+                            alert(`No user found with the username "${username}"`);
+                        } else {
+                            displayUsers(users);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching users:', error));
+            }
+        }
+    </script>
+</body>
+</html>
